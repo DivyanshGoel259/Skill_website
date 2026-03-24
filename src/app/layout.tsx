@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "AI Agent Skills Directory",
   description: "A premium directory for AI agent skills, workflows, configurations, and reference snippets.",
+  verification: {
+    google: "YWvp0oluneNIh37FxFflar5NrvR-JVbpcInHQcC2vFA",
+  },
 };
 
 export default function RootLayout({
