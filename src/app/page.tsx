@@ -32,14 +32,14 @@ export default function Home() {
           <span className="text-gradient">Curated Skills</span>
         </h1>
         
-        <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto mt-4 drop-shadow-md">
-          Discover, copy, and install production-ready skills, prompts, and server configurations to supercharge your AI workflows instantly.
-          <span className="block mt-3 text-sm font-medium text-white/50 space-x-3">
-            <span>✓ 100% Tested & Authenticated</span>
+        <p className="text-base md:text-lg text-white/70 max-w-xl mx-auto mt-4 drop-shadow-md">
+          Discover and deploy production-ready skills to supercharge your AI workflows.
+          <span className="block mt-3 text-sm font-medium text-white/50 space-x-3 flex items-center justify-center">
+            <span>✓ 100% Tested</span>
             <span className="opacity-50">•</span>
-            <span>✓ Prompt Injection Protected</span>
+            <span>✓ Secure</span>
             <span className="opacity-50">•</span>
-            <span>✓ Zero Vulnerabilities</span>
+            <span>✓ Prompt Safe</span>
           </span>
         </p>
       </div>
