@@ -1,0 +1,118 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-03-03T16:55:09.760900",
+  "description": "Skill completion event emission for coordination service",
+  "event_schema": {
+    "skill_completion_event": {
+      "event_type": "SKILL_COMPLETE",
+      "skill": "string (domain:skill-name)",
+      "phase": "int (1-9)",
+      "status": "enum [PASS, WARN, FAIL]",
+      "outputs": [
+        "list of output file paths"
+      ],
+      "quality_gates": {
+        "gate_name": {
+          "metric": "value",
+          "passed": "bool",
+          "severity": "enum [LOW, MEDIUM, HIGH, CRITICAL]"
+        }
+      },
+      "execution_time_ms": "int",
+      "timestamp": "ISO 8601",
+      "next_action_recommended": "string (domain:skill-name)",
+      "next_action_reason": "string"
+    }
+  },
+  "event_examples": {
+    "code_review_pass": {
+      "event_type": "SKILL_COMPLETE",
+      "skill": "sde:code-review",
+      "phase": 6,
+      "status": "PASS",
+      "outputs": [
+        ".sde/reviews/pr-123.md"
+      ],
+      "quality_gates": {
+        "review_severity": {
+          "metric": "LOW",
+          "passed": true,
+          "severity": "LOW"
+        },
+        "test_coverage": {
+          "metric": "87%",
+          "passed": true,
+          "severity": "LOW"
+        }
+      },
+      "execution_time_ms": 1250,
+      "timestamp": "2026-03-03T17:00:00Z",
+      "next_action_recommended": "qae:test-strategy",
+      "next_action_reason": "Code review passed, ready for QA testing"
+    },
+    "code_review_fail_severity": {
+      "event_type": "SKILL_COMPLETE",
+      "skill": "sde:code-review",
+      "phase": 6,
+      "status": "FAIL",
+      "outputs": [
+        ".sde/reviews/pr-123.md"
+      ],
+      "quality_gates": {
+        "review_severity": {
+          "metric": "HIGH",
+          "passed": false,
+          "severity": "HIGH"
+        },
+        "test_coverage": {
+          "metric": "75%",
+          "passed": false,
+          "severity": "MEDIUM"
+        }
+      },
+      "execution_time_ms": 890,
+      "timestamp": "2026-03-03T17:15:00Z",
+      "next_action_recommended": "sde:code-craftsman",
+      "next_action_reason": "LOOP: Code review severity HIGH, refactoring required. Loop 1/5"
+    },
+    "defect_found_high": {
+      "event_type": "SKILL_COMPLETE",
+      "skill": "qae:defect-management",
+      "phase": 7,
+      "status": "FAIL",
+      "outputs": [
+        ".qae/defects/defects-2026-03-03.md"
+      ],
+      "quality_gates": {
+        "defect_severity": {
+          "metric": "HIGH",
+          "passed": false,
+          "severity": "HIGH"
+        },
+        "rca_complete": {
+          "metric": "yes",
+          "passed": true,
+          "severity": "LOW"
+        }
+      },
+      "execution_time_ms": 2100,
+      "timestamp": "2026-03-03T17:30:00Z",
+      "next_action_recommended": "sde:debugging",
+      "next_action_reason": "CROSS-DOMAIN LOOP: HIGH severity defect found, route to debugging. Loop 1/5"
+    }
+  },
+  "event_routing_rules": {
+    "PASS_status": "Route to next_skills_if_pass from skill manifest",
+    "FAIL_status": "Route to next_skills_if_fail from skill manifest",
+    "WARN_status": "Alert user, allow manual decision or default to next_skills_if_pass",
+    "severity_HIGH": "Always trigger loop/remediation, skip normal routing",
+    "severity_CRITICAL": "Halt execution, alert user immediately"
+  },
+  "event_sink": {
+    "type": "in-memory queue + file log",
+    "storage": ".project/events.jsonl",
+    "consumer": "master-orchestrator",
+    "polling_interval_ms": 500,
+    "queue_max_size": 100
+  }
+}

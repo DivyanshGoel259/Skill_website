@@ -1,0 +1,425 @@
+{
+  "version": "1.0.0",
+  "description": "Coordination Service Routing Rules — Intra/inter-domain routes and feedback loops",
+  "intra_domain_routes": {
+    "pm": [
+      {
+        "from": "prioritization-engine",
+        "condition": "conflicts > 2",
+        "loop_to": "gap-analyst",
+        "reason": "Multiple scoring conflicts require re-validation",
+        "exit_criteria": "conflicts == 0 && all items have unique RICE scores",
+        "max_loops": 2,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "prd-generator",
+        "condition": "acceptance_criteria < 5",
+        "loop_to": "discovery-validator",
+        "reason": "Insufficient acceptance criteria, need more validation",
+        "exit_criteria": "acceptance_criteria >= 5",
+        "max_loops": 2,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "gap-analyst",
+        "condition": "evidence_required && !evidence_found",
+        "loop_to": "research-agent",
+        "reason": "Evidence gaps require more research",
+        "exit_criteria": "evidence_found == true",
+        "max_loops": 2,
+        "escalation": "user_decision"
+      }
+    ],
+    "sde": [
+      {
+        "from": "code-review",
+        "condition": "severity >= HIGH",
+        "loop_to": "code-craftsman",
+        "reason": "High severity issues require refactoring",
+        "exit_criteria": "high_count == 0 && critical_count == 0",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "code-review",
+        "condition": "test_coverage < 80",
+        "loop_to": "tdd",
+        "reason": "Insufficient test coverage",
+        "exit_criteria": "test_coverage >= 80 && failing_tests == 0",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "architecture",
+        "condition": "solid_violations > 0",
+        "loop_to": "system-design",
+        "reason": "SOLID violations require redesign",
+        "exit_criteria": "solid_violations == 0",
+        "max_loops": 2,
+        "escalation": "user_decision"
+      }
+    ],
+    "qae": [
+      {
+        "from": "quality-metrics",
+        "condition": "coverage < baseline",
+        "loop_to": "test-automation",
+        "reason": "Test coverage below baseline",
+        "exit_criteria": "coverage >= baseline",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "security",
+        "condition": "critical_vulns > 0",
+        "loop_to": "security",
+        "reason": "Critical vulnerabilities must be re-tested after fix",
+        "exit_criteria": "critical_vulns == 0 && high_vulns == 0",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "defect-management",
+        "condition": "critical_defects > 0 || high_defects > 5",
+        "loop_to": "exploratory",
+        "reason": "Critical defects require more testing",
+        "exit_criteria": "critical_defects == 0 && high_defects == 0",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      }
+    ],
+    "ux": [
+      {
+        "from": "accessibility",
+        "condition": "wcag_level_aa == false",
+        "loop_to": "component-design",
+        "reason": "WCAG AA compliance required",
+        "exit_criteria": "wcag_violations == 0",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "review",
+        "condition": "heuristic_score < 8",
+        "loop_to": "component-design",
+        "reason": "Design review score too low",
+        "exit_criteria": "heuristic_score >= 7 on all 10 heuristics",
+        "max_loops": 3,
+        "escalation": "user_decision"
+      }
+    ],
+    "pe": [
+      {
+        "from": "architecture-reviewer",
+        "condition": "review_approved == false",
+        "loop_to": "tech-strategy",
+        "reason": "Architecture review not approved",
+        "exit_criteria": "ADR written && rough_consensus == true",
+        "max_loops": 2,
+        "escalation": "user_decision"
+      },
+      {
+        "from": "technical-quality",
+        "condition": "tier < 5",
+        "loop_to": "leverage-analyzer",
+        "reason": "Technical quality tier too low",
+        "exit_criteria": "top_3_leverage_opportunities identified && actionable",
+        "max_loops": 2,
+        "escalation": "user_decision"
+      }
+    ]
+  },
+  "inter_domain_routes": [
+    {
+      "from": "pm:research-agent",
+      "to": "pm:gap-analyst",
+      "phase_transition": "1→1",
+      "condition": "status == PASS",
+      "type": "intra_domain"
+    },
+    {
+      "from": "pm:gap-analyst",
+      "to": "pm:prioritization-engine",
+      "phase_transition": "3→3",
+      "condition": "status == PASS",
+      "type": "intra_domain"
+    },
+    {
+      "from": "pm:prd-generator",
+      "to": "ux:design-system",
+      "phase_transition": "3→4",
+      "condition": "status == PASS",
+      "type": "inter_domain_forward",
+      "auto_queue": true
+    },
+    {
+      "from": "ux:design-system",
+      "to": "ux:component-design",
+      "phase_transition": "4→4",
+      "condition": "status == PASS",
+      "type": "intra_domain"
+    },
+    {
+      "from": "ux:component-design",
+      "to": "ux:accessibility",
+      "phase_transition": "4→4",
+      "condition": "status == PASS",
+      "type": "intra_domain"
+    },
+    {
+      "from": "ux:accessibility",
+      "to": "sde:system-design",
+      "phase_transition": "4→5",
+      "condition": "status == PASS",
+      "type": "inter_domain_forward",
+      "auto_queue": true
+    },
+    {
+      "from": "sde:system-design",
+      "to": "sde:architecture",
+      "phase_transition": "5→5",
+      "condition": "status == PASS",
+      "type": "intra_domain"
+    },
+    {
+      "from": "sde:architecture",
+      "to": "pe:architecture-reviewer",
+      "phase_transition": "5→5",
+      "condition": "status == PASS",
+      "type": "intra_domain",
+      "note": "PE review is mandatory before Phase 6"
+    },
+    {
+      "from": "sde:code-review",
+      "to": "qae:test-strategy",
+      "phase_transition": "6→7",
+      "condition": "status == PASS && build_verified == true && stub_scan_clean == true && test_coverage >= 80 && contract_violations == 0",
+      "type": "inter_domain_forward",
+      "auto_queue": true,
+      "blocking_gates": [
+        {
+          "gate": "build_verification",
+          "description": "Project compiles without errors",
+          "command_examples": {
+            "swift": "swift build 2>&1 | tail -20",
+            "node": "npm run build",
+            "python": "python -m py_compile on all source files",
+            "go": "go build ./..."
+          },
+          "pass_criteria": "exit_code == 0",
+          "fail_action": "BLOCK — fix compilation errors, route to sde:code-craftsman"
+        },
+        {
+          "gate": "stub_scan",
+          "description": "No TODO/FIXME/placeholder stubs in source code",
+          "command": "grep -rn 'TODO\\|FIXME\\|HACK\\|STUB\\|placeholder.*compilation\\|placeholder.*accessor\\|fatalError.*not.implemented\\|NotImplementedError\\|throw new Error.*not implemented' --include='*.swift' --include='*.ts' --include='*.py' --include='*.go' --include='*.java' .",
+          "pass_criteria": "match_count == 0",
+          "fail_action": "BLOCK — replace all stubs with real implementations, route to sde:code-craftsman"
+        },
+        {
+          "gate": "test_coverage",
+          "description": "Minimum 80% test coverage achieved",
+          "pass_criteria": "coverage >= 80",
+          "fail_action": "BLOCK — write more tests, route to sde:tdd"
+        },
+        {
+          "gate": "contract_integrity",
+          "description": "All parallel-built interfaces compile together",
+          "pass_criteria": "full project compiles with all agents code combined, no type mismatches",
+          "fail_action": "BLOCK — resolve interface mismatches, regenerate contracts"
+        }
+      ],
+      "note": "ALL 4 blocking gates must PASS before Phase 7 begins. This is the critical enforcement point that prevents untested code from proceeding."
+    },
+    {
+      "from": "qae:quality-metrics",
+      "to": "pm:stakeholder-communicator",
+      "phase_transition": "7→8",
+      "condition": "status == PASS && critical_defects == 0",
+      "type": "inter_domain_forward",
+      "auto_queue": true
+    },
+    {
+      "from": "qae:defect-management",
+      "to": "sde:debugging",
+      "phase_transition": "7⟲6",
+      "condition": "severity == HIGH || count > 5",
+      "type": "feedback_loop",
+      "reason": "High severity defects require bug fixes and re-testing",
+      "exit_criteria": "open_bugs == 0 (all FIXED and VERIFIED)",
+      "max_loops": 5,
+      "escalation": "user_decision"
+    },
+    {
+      "from": "sde:code-review",
+      "to": "sde:code-craftsman",
+      "phase_transition": "6⟲6",
+      "condition": "severity >= HIGH",
+      "type": "intra_domain_loop",
+      "reason": "Code quality issues require refactoring",
+      "exit_criteria": "high_count == 0 && critical_count == 0",
+      "max_loops": 3,
+      "escalation": "user_decision"
+    },
+    {
+      "from": "sde:estimation",
+      "to": "pm:discovery-validator",
+      "phase_transition": "3⟲2",
+      "condition": "effort > available_capacity",
+      "type": "feedback_loop",
+      "reason": "Effort exceeds capacity, need to descope",
+      "exit_criteria": "effort <= available_capacity after descoping",
+      "max_loops": 2,
+      "escalation": "user_decision"
+    },
+    {
+      "from": "pe:architecture-reviewer",
+      "to": "sde:system-design",
+      "phase_transition": "5⟲5",
+      "condition": "review_approved == false",
+      "type": "intra_domain_loop",
+      "reason": "Architecture issues require design revision",
+      "exit_criteria": "ADR written && review_approved == true",
+      "max_loops": 2,
+      "escalation": "user_decision"
+    },
+    {
+      "from": "qae:security",
+      "to": "sde:debugging",
+      "phase_transition": "7⟲6",
+      "condition": "critical_vulns > 0",
+      "type": "feedback_loop",
+      "reason": "Security vulnerabilities require fixes",
+      "exit_criteria": "critical_vulns == 0 && high_vulns == 0 after re-scan",
+      "max_loops": 3,
+      "escalation": "user_decision"
+    },
+    {
+      "from": "ux:accessibility",
+      "to": "ux:component-design",
+      "phase_transition": "4⟲4",
+      "condition": "wcag_level_aa == false",
+      "type": "intra_domain_loop",
+      "reason": "WCAG compliance required",
+      "exit_criteria": "wcag_violations == 0",
+      "max_loops": 3,
+      "escalation": "user_decision"
+    }
+  ],
+  "phase_progression": {
+    "phase_1": {
+      "name": "Discovery",
+      "skills": ["pm:research-agent", "pm:customer-research", "pm:buyer-psychology", "pe:org-health"],
+      "outputs": [".pm/competitors/", ".pm/research/"],
+      "gate_type": "soft",
+      "next_phase": 2
+    },
+    "phase_2": {
+      "name": "Validation",
+      "skills": ["pm:discovery-validator", "pm:experiment-designer", "pe:tech-strategy", "ux:design-system"],
+      "outputs": [".pm/experiments/", ".pe/strategy/", ".ux/design-systems/"],
+      "gate_type": "soft",
+      "next_phase": 3
+    },
+    "phase_3": {
+      "name": "Planning",
+      "skills": ["pm:gap-analyst", "pm:prioritization-engine", "pm:prd-generator", "pm:metrics-advisor", "pe:architecture-reviewer"],
+      "outputs": [".pm/prds/", ".pm/gaps/", ".pm/metrics/", ".pe/architecture/"],
+      "gate_type": "hard",
+      "next_phase": 4
+    },
+    "phase_4": {
+      "name": "Design",
+      "skills": ["ux:design-system", "ux:color-system", "ux:typography", "ux:visual-hierarchy", "ux:component-design", "ux:responsive", "ux:interaction-design", "ux:accessibility"],
+      "outputs": [".ux/design-systems/", ".ux/components/"],
+      "gate_type": "hard",
+      "next_phase": 5
+    },
+    "phase_5": {
+      "name": "Architecture",
+      "skills": ["sde:requirements", "sde:system-design", "sde:architecture", "pe:leverage-analyzer"],
+      "outputs": [".sde/requirements/", ".sde/designs/", ".sde/architecture/", ".pe/decisions/"],
+      "gate_type": "hard",
+      "next_phase": 6
+    },
+    "phase_6": {
+      "name": "Build",
+      "skills": ["sde:requirements", "sde:tdd", "sde:code-craftsman", "sde:code-review"],
+      "outputs": [".sde/code/", ".sde/tests/", ".sde/reviews/"],
+      "gate_type": "hard",
+      "next_phase": 7,
+      "completion_gates": [
+        {"gate": "build_passes", "type": "hard", "description": "Project build command exits 0 with no errors"},
+        {"gate": "stub_scan_clean", "type": "hard", "description": "No TODO/FIXME/placeholder stubs found in source"},
+        {"gate": "test_coverage_80", "type": "hard", "description": "Test coverage >= 80% with zero test failures"},
+        {"gate": "contract_integrity", "type": "hard", "description": "All parallel-agent interfaces compile together without type mismatches"}
+      ],
+      "gate_enforcement": "ALL completion_gates must PASS before next_phase activates. If ANY gate fails, phase remains IN PROGRESS and orchestrator loops back to the appropriate skill."
+    },
+    "phase_7": {
+      "name": "Quality",
+      "skills": ["qae:test-strategy", "qae:test-plan", "qae:test-automation", "qae:api-testing", "qae:performance", "qae:security", "qae:exploratory", "qae:defect-management", "qae:quality-metrics"],
+      "outputs": [".qae/strategies/", ".qae/plans/", ".qae/defects/", ".qae/metrics/"],
+      "gate_type": "hard",
+      "next_phase": 8
+    },
+    "phase_8": {
+      "name": "Launch",
+      "skills": ["pm:stakeholder-communicator", "qae:cicd-pipeline"],
+      "outputs": [".pm/stakeholder/", ".qae/pipelines/"],
+      "gate_type": "hard",
+      "next_phase": 9
+    },
+    "phase_9": {
+      "name": "Feedback",
+      "skills": ["pm:metrics-advisor", "pm:pivot-analyzer", "pe:technical-quality"],
+      "outputs": [".pm/metrics/", ".pm/analysis/", ".pe/quality/"],
+      "gate_type": "soft",
+      "next_phase": null
+    }
+  },
+  "loop_limits": {
+    "max_loops_per_phase": 5,
+    "max_total_loops": 20,
+    "loop_timeout_multiplier": 2.0,
+    "user_override_enabled": true
+  },
+  "gate_variables": {
+    "build_verified": {
+      "source": "Gate 6A: build_command exit code from .project/environment.json",
+      "type": "boolean",
+      "set_by": "orchestrator runs build_command, sets true if exit_code == 0"
+    },
+    "stub_scan_clean": {
+      "source": "Gate 6B: grep result for TODO/FIXME/STUB patterns",
+      "type": "boolean",
+      "set_by": "orchestrator runs stub scan grep with extensions from .project/environment.json, sets true if match_count == 0"
+    },
+    "test_coverage": {
+      "source": "Gate 6C: test_command coverage output from .project/environment.json",
+      "type": "number",
+      "set_by": "orchestrator runs test_command, parses coverage percentage from output"
+    },
+    "contract_violations": {
+      "source": "Gate 6D: compilation check after combining parallel agents code",
+      "type": "number",
+      "set_by": "orchestrator runs build_command on full project after all parallel agents complete, counts compile errors at interface boundaries"
+    },
+    "status": {
+      "source": "skill completion status",
+      "type": "string",
+      "set_by": "skill output (PASS or FAIL)"
+    },
+    "critical_defects": {
+      "source": "qae:defect-management output",
+      "type": "number",
+      "set_by": "count of defects with severity == CRITICAL in .qae/defects/"
+    },
+    "severity": {
+      "source": "defect or issue severity from skill output",
+      "type": "string",
+      "set_by": "skill output (CRITICAL, HIGH, MEDIUM, LOW)"
+    }
+  }
+}

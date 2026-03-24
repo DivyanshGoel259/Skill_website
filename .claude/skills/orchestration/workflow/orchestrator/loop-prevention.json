@@ -1,0 +1,67 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-03-03T16:54:53.709531",
+  "description": "Loop prevention and tracking system",
+  "loop_limits": {
+    "max_loops_per_phase": 5,
+    "max_loops_per_skill": 3,
+    "max_consecutive_loops": 2,
+    "enforcement": "halt_and_alert"
+  },
+  "loop_detection_rules": {
+    "intra_domain_loop": {
+      "trigger": "skill routes back to earlier skill in same domain",
+      "example": "code-review \u2192 code-craftsman (severity HIGH)",
+      "prevention": "increment phase loop counter, check < 5"
+    },
+    "inter_domain_loop": {
+      "trigger": "quality gate failure routes to upstream domain",
+      "example": "qae:defect-management \u2192 sde:debugging",
+      "prevention": "check max_consecutive_loops < 2, track in .project/loops.md"
+    },
+    "feedback_loop": {
+      "trigger": "skill routes back 2+ phases",
+      "example": "sde:estimation (effort > capacity) \u2192 pm:discovery-validator",
+      "prevention": "mark as feedback loop, allow up to 2, warn on 3rd"
+    }
+  },
+  "loop_tracking_schema": {
+    "loop_entry": {
+      "phase": "int (1-9)",
+      "from_skill": "string (domain:skill)",
+      "to_skill": "string (domain:skill)",
+      "loop_reason": "string (quality gate condition)",
+      "loop_number": "int (1-5+)",
+      "loop_type": "enum [intra_domain, inter_domain, feedback]",
+      "started_at": "ISO timestamp",
+      "resolved": "bool"
+    }
+  },
+  "loop_recovery_strategies": {
+    "max_exceeded": {
+      "action": "halt execution",
+      "message": "Loop limit exceeded. Manual intervention required.",
+      "user_options": [
+        "skip_skill",
+        "reset_loop_count",
+        "manual_override"
+      ]
+    },
+    "infinite_loop_detected": {
+      "action": "halt execution",
+      "message": "Infinite loop detected (same skill \u2192 same skill)",
+      "user_options": [
+        "skip_skill",
+        "modify_condition"
+      ]
+    },
+    "cross_domain_deadlock": {
+      "action": "alert user",
+      "message": "Two domains waiting on each other. Recommend manual decision.",
+      "user_options": [
+        "break_deadlock",
+        "modify_routing_rule"
+      ]
+    }
+  }
+}

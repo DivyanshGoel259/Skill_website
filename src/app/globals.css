@@ -1,1 +1,82 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #05050A;
+  --color-foreground: #EDEDED;
+  
+  --color-brand-purple: #8B5CF6;
+  --color-brand-blue: #3B82F6;
+  --color-brand-pink: #EC4899;
+  
+  --color-glass-bg: rgba(20, 20, 25, 0.4);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@utility text-gradient {
+  background: linear-gradient(to right, var(--color-brand-blue), var(--color-brand-purple), var(--color-brand-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility glass {
+  background: var(--color-glass-bg);
+  border: 1px solid var(--color-glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+body {
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  /* subtle radial glow top center */
+  background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 50%);
+}
+
+/* Custom Webkit Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: #fff;
+}
+
+/* Custom Markdown Prose Styles */
+.prose {
+  @apply text-white/80 leading-relaxed;
+}
+.prose h1 { @apply text-3xl font-bold mt-8 mb-4 text-white tracking-tight; }
+.prose h2 { @apply text-2xl font-semibold mt-8 mb-4 border-b border-white/10 pb-2 text-white; }
+.prose h3 { @apply text-xl font-medium mt-6 mb-3 text-white; }
+.prose h4 { @apply text-lg font-medium mt-4 mb-2 text-white; }
+.prose p { @apply my-4; }
+.prose ul { @apply list-disc list-outside ml-6 my-4 space-y-1 marker:text-brand-purple; }
+.prose ol { @apply list-decimal list-outside ml-6 my-4 space-y-1 marker:text-brand-purple; }
+.prose li { @apply pl-1; }
+.prose a { @apply text-brand-purple hover:text-brand-purple/80 underline underline-offset-2 transition-colors; }
+.prose blockquote { @apply border-l-4 border-brand-purple pl-4 italic text-white/60 my-6 bg-brand-purple/5 py-3 pr-4 rounded-r-lg; }
+.prose table { @apply w-full text-left border-collapse my-6 text-sm; }
+.prose th, .prose td { @apply border border-white/10 p-3 align-top; }
+.prose th { @apply bg-white/5 font-semibold text-white; }
+.prose tr:nth-child(even) { @apply bg-white/[0.02]; }
+.prose hr { @apply border-t border-white/10 my-8; }
+.prose strong { @apply text-white font-semibold; }
+.prose pre code { @apply bg-transparent p-0 text-white/90; }
