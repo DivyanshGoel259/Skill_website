@@ -27,7 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     
     const zipContent = await zip.generateAsync({ type: "nodebuffer" });
     
-    return new Response(zipContent, {
+    return new Response(zipContent as any, {
       status: 200,
       headers: {
         "Content-Type": "application/zip",
