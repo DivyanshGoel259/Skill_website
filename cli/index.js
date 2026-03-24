@@ -8,7 +8,7 @@ const skillName = process.argv[2];
 
 if (!skillName) {
   console.error("❌ Error: Please provide a skill name!");
-  console.error("📝 Example: npx @divyanshgoel/add-skill chief-of-staff");
+  console.error("📝 Example: npx @cutdnoise/add-skill chief-of-staff");
   process.exit(1);
 }
 

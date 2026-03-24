@@ -1,5 +1,5 @@
 {
-  "name": "@divyanshgoel/add-skill",
+  "name": "@cutdnoise/add-skill",
   "version": "1.0.0",
   "description": "CLI tool to download and install AI agent skills directly into your workspace.",
   "main": "index.js",

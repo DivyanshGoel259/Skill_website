@@ -82,7 +82,7 @@ export function getAllSkills(): SkillData[] {
         title: frontmatterName || defaultSlug,
         description: matterResult.data.description || 'No description provided.',
         category: matterResult.data.category || categoryFromFolder.charAt(0).toUpperCase() + categoryFromFolder.slice(1),
-        installCommand: matterResult.data.installCommand || `npx @divyanshgoel/add-skill ${slug}`,
+        installCommand: matterResult.data.installCommand || `npx @cutdnoise/add-skill ${slug}`,
         content: matterResult.content,
         files: skillFiles,
         dirPath: parentDir.replace(/\\/g, '/'),
