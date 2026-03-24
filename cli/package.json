@@ -1,0 +1,23 @@
+{
+  "name": "@divyanshgoel/add-skill",
+  "version": "1.0.0",
+  "description": "CLI tool to download and install AI agent skills directly into your workspace.",
+  "main": "index.js",
+  "bin": {
+    "add-skill": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "skills",
+    "agents",
+    "claude"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "adm-zip": "^0.5.10"
+  }
+}
