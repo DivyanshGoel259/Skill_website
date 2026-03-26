@@ -1,34 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Agent Skills Directory 🚀
 
-## Getting Started
+A premium directory of production-ready instruction sets (skills) for AI coding agents like Claude, Cursor, and Windsurf.
 
-First, run the development server:
+**Live Website:** [https://skills-anthropic.vercel.app/](https://skills-anthropic.vercel.app/)
 
+---
+
+## 🏗️ Project Overview
+
+This repository contains the source code for the AI Agent Skills Directory. The goal is to provide a central hub where developers can find and install high-quality, pre-built skills to supercharge their AI development workflows.
+
+### Key Features
+- **Categorized Skills:** Browse skills for Frontend, Backend, Devops, Security, and more.
+- **One-Command Installation:** Use our CLI to add skills directly to your project.
+- **Premium UI:** Built with Next.js, Tailwind CSS, and Framer Motion for a stunning dark glassmorphism aesthetic.
+- **Smart Integration:** Automatically detects `.claude/skills` for Claude Code or `skills/` for other agents.
+
+---
+
+## ⚡ Quick Start
+
+### 1. Clone & Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/DivyanshGoel259/Skill_website.git
+cd Skill_website
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Run Locally
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to see the directory in action.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-## Learn More
+## 🛠️ Adding New Skills
 
-To learn more about Next.js, take a look at the following resources:
+Adding a skill is as simple as adding a folder and a markdown file.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  Navigate to the `skills/` directory.
+2.  Choose or create a category folder (e.g., `engineering/frontend/`).
+3.  Create a new skill folder with a `SKILL.md` file.
+4.  Write your skill documentation following the [Docs format](https://skills-anthropic.vercel.app/docs).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The website will automatically discover and list your new skill on the next build.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📦 Using the CLI
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Users can install skills from this directory using our one-line command:
+
+```bash
+npx @cutdnoise/add-skill <skill-name>
+```
+
+Replace `<skill-name>` with any skill found in the directory (e.g., `nextjs`, `tailwind-design-system`).
+
+---
+
+## ☁️ Deployment
+
+This project is optimized for deployment on **Vercel**.
+
+1.  Push your changes to GitHub.
+2.  Connect your repository to Vercel.
+3.  Build command: `npm run build`
+4.  Output directory: `.next`
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+Built with ❤️ by [Divyansh Goel](https://github.com/DivyanshGoel259)
